@@ -35,5 +35,5 @@ ExitApp
 
 FileAppend,
 (
-	Robocopy \\swenas\banan \\Lianas\banan <files> \s \zb \copyall \mir \unilog<Logfile> \r: \w:
+	Robocopy \\Source\folder \\destination\folder <files> \s \zb \copyall \mir \unilog<Logfile> \r: \w:
 ), %A_ScriptDir%\Batch-temp.bat
