@@ -1,10 +1,10 @@
-﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
-Gui, Add, Button, x22 y319 w100 h30 , Run Script
-Gui, Add, Button, x352 y319 w100 h30 , Generate
+Gui, Add, Button, gRunScript x22 y319 w100 h30 , Run Script
+Gui, Add, Button, gGenerateFile x352 y319 w100 h30 , Generate
 Gui, Add, Tab2, x12 y9 w450 h280 , Path|Options|Output|Help
 Gui, Add, GroupBox, x22 y39 w430 h50 , Source
 Gui, Add, Edit, x32 y59 w410 h20 , 
@@ -33,7 +33,19 @@ return
 GuiClose:
 ExitApp
 
+RunScript:
+run, %A_ScriptDir%\Batch-temp.bat
+return
+
+GenerateFile:
 FileAppend,
 (
-	Robocopy \\Source\folder \\destination\folder <files> \s \zb \copyall \mir \unilog<Logfile> \r: \w:
+	@Echo off
+	Echo HELLO!!!
+	pause
+	exit
 ), %A_ScriptDir%\Batch-temp.bat
+return
+
+
+;Robocopy \\swenas\banan \\Lianas\banan <files> \s \zb \copyall \mir \unilog<Logfile> \r: \w:
