@@ -19,7 +19,7 @@ Gui, Add, Edit, x32 y179 w410 h20 vFileCards gFileCards,
 Gui, Tab, Options
 Gui, Add, GroupBox, x32 y49 w150 h180 , Group 1
 Gui, Add, GroupBox, x192 y49 w250 h140 , Group 2
-Gui, Add, CheckBox, x42 y69 w130 h30 , Subdirectories
+Gui, Add, CheckBox, x42 y69 w130 h30 vSubDir , Subdirectories
 Gui, Add, CheckBox, x42 y109 w130 h30 , Restartable mode
 Gui, Add, CheckBox, x42 y149 w130 h30 , Copy all file information
 Gui, Add, CheckBox, x42 y189 w130 h30 , Mirror
@@ -61,20 +61,26 @@ NewVarFileCards := FileCards
 GuiControl,, NewVarFileCards, %NewVarFileCards%
 return
 
+Checkboxes:
+Gui, Submit, NoHide
+if SubDir = 1
+	;This is where I am, next step create this function
+return
+
 RunScript:
 run, %A_ScriptDir%\Batch-temp.bat
 return
 
 GenerateFile:
+if FileExist(A_ScriptDir "\batch-temp.bat")
+	FileDelete, %A_ScriptDir%\Batch-temp.bat
+
 FileAppend,
 (
-	@Echo off
-	
-	%Source% %Dest% %FileCards%
-	
-	Echo HELLO!!!
-	pause
-	exit
+%Source% %Dest% %FileCards% %SubDir%
+
+pause
+exit
 ), %A_ScriptDir%\Batch-temp.bat
 return
 
