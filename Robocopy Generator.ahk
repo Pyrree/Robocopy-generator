@@ -3,11 +3,15 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
-;Some predetermend values
-SubDir := ""
+
+SubDir :=8
+
+;Everything GUI
+;##############################################################
 
 ;Shown on all tabs
 Gui, Add, Button, gRunScript x22 y319 w100 h30 , Run Script
+Gui, Add, Button, gTestSomething x240 y319 w100 h30 , Test
 Gui, Add, Button, gGenerateFile x352 y319 w100 h30 , Generate
 ;Tabs Properties
 Gui, Add, Tab2, x12 y9 w450 h280 , Path|Options|Output|Help
@@ -23,7 +27,7 @@ Gui, Tab, Options
 Gui, Add, GroupBox, x32 y49 w150 h180 , Group 1
 Gui, Add, GroupBox, x192 y49 w250 h140 , Group 2
 Gui, Add, CheckBox, x42 y69 w130 h30 vSubDir gCheckboxes , Subdirectories
-Gui, Add, CheckBox, x42 y109 w130 h30 , Restartable mode
+Gui, Add, CheckBox, x42 y109 w130 h30 vRestartMode gCheckboxes , Restartable mode
 Gui, Add, CheckBox, x42 y149 w130 h30 , Copy all file information
 Gui, Add, CheckBox, x42 y189 w130 h30 , Mirror
 Gui, Add, GroupBox, x202 y69 w230 h50 , Restart amount
@@ -46,6 +50,9 @@ return
 GuiClose:
 ExitApp
 
+;All functions and buttons
+;##############################################################
+
 Source:
 Gui, Submit, NoHide		; <- GuiControlGet would work here too
 NewVarSource := Source 
@@ -67,12 +74,36 @@ return
 Checkboxes:
 Gui, Submit, NoHide
 if SubDir = 1
-	SubDir = \S
+	SubDir :="/S"
 if Subdir = 0
-	Subdir = 
+	SubDir :=""
+if RestartMode = 1
+	RestartMode :="/ZB"
+if RestartMode = 0
+	RestartMode :=""
 return
 
+TestSomething:
+MsgBox ("Subdir=%SubDir% Restartablemode=%RestartMode%")
+Return
+
+;Run and Generate batch file
+;##############################################################
+
 RunScript:
+if FileExist(A_ScriptDir "\batch-temp.bat")
+	FileDelete, %A_ScriptDir%\Batch-temp.bat
+
+FileAppend,
+(
+robocopy %Source% %Dest% %FileCards% %SubDir%
+
+pause
+exit
+), %A_ScriptDir%\Batch-temp.bat
+
+Sleep, 200
+
 run, %A_ScriptDir%\Batch-temp.bat
 return
 
@@ -82,7 +113,7 @@ if FileExist(A_ScriptDir "\batch-temp.bat")
 
 FileAppend,
 (
-robocopy %Source% %Dest% %FileCards%%SubDir%
+robocopy %Source% %Dest% %FileCards% %SubDir% %RestartMode%
 
 pause
 exit
