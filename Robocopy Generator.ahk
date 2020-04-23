@@ -3,6 +3,9 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
+;Some predetermend values
+SubDir := ""
+
 ;Shown on all tabs
 Gui, Add, Button, gRunScript x22 y319 w100 h30 , Run Script
 Gui, Add, Button, gGenerateFile x352 y319 w100 h30 , Generate
@@ -19,7 +22,7 @@ Gui, Add, Edit, x32 y179 w410 h20 vFileCards gFileCards,
 Gui, Tab, Options
 Gui, Add, GroupBox, x32 y49 w150 h180 , Group 1
 Gui, Add, GroupBox, x192 y49 w250 h140 , Group 2
-Gui, Add, CheckBox, x42 y69 w130 h30 vSubDir , Subdirectories
+Gui, Add, CheckBox, x42 y69 w130 h30 vSubDir gCheckboxes , Subdirectories
 Gui, Add, CheckBox, x42 y109 w130 h30 , Restartable mode
 Gui, Add, CheckBox, x42 y149 w130 h30 , Copy all file information
 Gui, Add, CheckBox, x42 y189 w130 h30 , Mirror
@@ -64,7 +67,9 @@ return
 Checkboxes:
 Gui, Submit, NoHide
 if SubDir = 1
-	;This is where I am, next step create this function
+	SubDir = \S
+if Subdir = 0
+	Subdir = 
 return
 
 RunScript:
@@ -77,7 +82,7 @@ if FileExist(A_ScriptDir "\batch-temp.bat")
 
 FileAppend,
 (
-%Source% %Dest% %FileCards% %SubDir%
+robocopy %Source% %Dest% %FileCards%%SubDir%
 
 pause
 exit
