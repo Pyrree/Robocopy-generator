@@ -3,8 +3,11 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
-
-SubDir :=8
+;Some Predetermined variables, at least until I find another way of doing the checkboxes
+SubDir :=""
+RestartMode :=""
+CopyAll :=""
+Mirror :=""
 
 ;Everything GUI
 ;##############################################################
@@ -28,8 +31,8 @@ Gui, Add, GroupBox, x32 y49 w150 h180 , Group 1
 Gui, Add, GroupBox, x192 y49 w250 h140 , Group 2
 Gui, Add, CheckBox, x42 y69 w130 h30 vSubDir gCheckboxes , Subdirectories
 Gui, Add, CheckBox, x42 y109 w130 h30 vRestartMode gCheckboxes , Restartable mode
-Gui, Add, CheckBox, x42 y149 w130 h30 , Copy all file information
-Gui, Add, CheckBox, x42 y189 w130 h30 , Mirror
+Gui, Add, CheckBox, x42 y149 w130 h30 vCopyAll gCheckboxes , Copy all file information
+Gui, Add, CheckBox, x42 y189 w130 h30 vMirror gCheckboxes , Mirror
 Gui, Add, GroupBox, x202 y69 w230 h50 , Restart amount
 Gui, Add, GroupBox, x202 y129 w230 h50 , Wait amount
 Gui, Add, Edit, x212 y149 w210 h20 , 
@@ -38,13 +41,15 @@ Gui, Add, Edit, x212 y89 w210 h20 ,
 Gui, Tab, Output
 Gui, Add, CheckBox, x32 y219 w100 h40 , Create logfile
 Gui, Add, Edit, x142 y229 w290 h20 , 
-Gui, Add, GroupBox, x22 y199 w420 h70 , Logging
+Gui, Add, GroupBox, x22 y199 w430 h70 , Logging
+Gui, Add, GroupBox, x22 y39 w430 h160 , Batch output
+Gui, Add, Edit, x32 y59 w410 h130 vOutput gOutput
 ;Help Tab
 Gui, Tab, Help
 Gui, Add, GroupBox, x22 y39 w430 h230 , About
 ;Gui, Add, Text, x24 y41 w420 h220 , About
 ;Other
-Gui, Show, w479 h379, Robocopy Generator v0.0.1
+Gui, Show, w479 h379, Robocopy Generator v0.1.3
 return
 
 GuiClose:
@@ -54,37 +59,48 @@ ExitApp
 ;##############################################################
 
 Source:
-Gui, Submit, NoHide		; <- GuiControlGet would work here too
-NewVarSource := Source 
-GuiControl,, NewVarSource, %NewVarSource%
+GuiControlGet, Source
 return
 
 Dest:
-Gui, Submit, NoHide
-NewVarDest := Dest 
-GuiControl,, NewVarDest, %NewVarDest%
+GuiControlGet, Dest
 return
 
 FileCards:
-Gui, Submit, NoHide
-NewVarFileCards := FileCards 
-GuiControl,, NewVarFileCards, %NewVarFileCards%
+GuiControlGet, FileCards
 return
 
 Checkboxes:
 Gui, Submit, NoHide
 if SubDir = 1
-	SubDir :="/S"
+	SubDir :=" /S"
 if Subdir = 0
 	SubDir :=""
+
 if RestartMode = 1
-	RestartMode :="/ZB"
+	RestartMode :=" /ZB"
 if RestartMode = 0
 	RestartMode :=""
+
+if CopyAll = 1
+	CopyAll :=" /COPYALL"
+if CopyAll = 0
+	CopyAll :=""
+
+if Mirror = 1
+	Mirror :=" /MIR"
+if Mirror = 0
+	Mirror :=""
+return
+
+Output:
+Output = "Robocopy %Mirror%"
 return
 
 TestSomething:
-MsgBox ("Subdir=%SubDir% Restartablemode=%RestartMode%")
+Gui, Submit, NoHide
+NewVarOutput := Output
+GuiControl,, NewVarOutput, %Output%
 Return
 
 ;Run and Generate batch file
@@ -96,7 +112,7 @@ if FileExist(A_ScriptDir "\batch-temp.bat")
 
 FileAppend,
 (
-robocopy %Source% %Dest% %FileCards% %SubDir%
+robocopy %Source% %Dest% %FileCards% %SubDir% %RestartMode% %CopyAll% %Mirror%
 
 pause
 exit
@@ -113,7 +129,7 @@ if FileExist(A_ScriptDir "\batch-temp.bat")
 
 FileAppend,
 (
-robocopy %Source% %Dest% %FileCards% %SubDir% %RestartMode%
+robocopy %Source% %Dest% %FileCards% %SubDir%%RestartMode%%CopyAll%%Mirror%
 
 pause
 exit
