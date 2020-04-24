@@ -8,13 +8,14 @@ SubDir :=""
 RestartMode :=""
 CopyAll :=""
 Mirror :=""
+FileCards :=""
 
 ;Everything GUI
 ;##############################################################
 
 ;Shown on all tabs
 Gui, Add, Button, gRunScript x22 y319 w100 h30 , Run Script
-Gui, Add, Button, gTestSomething x240 y319 w100 h30 , Test
+;Gui, Add, Button, gTestSomething x240 y319 w100 h30 , Test 
 Gui, Add, Button, gGenerateFile x352 y319 w100 h30 , Generate
 ;Tabs Properties
 Gui, Add, Tab2, x12 y9 w450 h280 , Path|Options|Output|Help
@@ -47,9 +48,9 @@ Gui, Add, Edit, x32 y59 w410 h130 vOutput gOutput
 ;Help Tab
 Gui, Tab, Help
 Gui, Add, GroupBox, x22 y39 w430 h230 , About
-;Gui, Add, Text, x24 y41 w420 h220 , About
+Gui, Add, Link, x32 y59, Check the <a href="https://github.com/Pyrree/Robocopy-generator">GitHub page</a>
 ;Other
-Gui, Show, w479 h379, Robocopy Generator v0.1.3
+Gui, Show, w479 h379, Robocopy Generator v0.1.4
 return
 
 GuiClose:
@@ -112,7 +113,7 @@ if FileExist(A_ScriptDir "\batch-temp.bat")
 
 FileAppend,
 (
-robocopy %Source% %Dest% %FileCards% %SubDir% %RestartMode% %CopyAll% %Mirror%
+robocopy %Source% %Dest% %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
 
 pause
 exit
@@ -129,7 +130,7 @@ if FileExist(A_ScriptDir "\batch-temp.bat")
 
 FileAppend,
 (
-robocopy %Source% %Dest% %FileCards% %SubDir%%RestartMode%%CopyAll%%Mirror%
+robocopy %Source% %Dest% %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
 
 pause
 exit
