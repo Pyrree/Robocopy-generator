@@ -4,6 +4,10 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 ;Some Predetermined variables, at least until I find another way of doing the checkboxes
+robocopy :="robocopy"
+Source :=""
+Dest :=""
+FileCards :=""
 SubDir :=""
 RestartMode :=""
 CopyAll :=""
@@ -44,13 +48,13 @@ Gui, Add, CheckBox, x32 y219 w100 h40 , Create logfile
 Gui, Add, Edit, x142 y229 w290 h20 , 
 Gui, Add, GroupBox, x22 y199 w430 h70 , Logging
 Gui, Add, GroupBox, x22 y39 w430 h160 , Batch output
-Gui, Add, Edit, x32 y59 w410 h130 vOutput gOutput
+Gui, Add, Edit, ReadOnly x32 y59 w410 h130 vOutput, 
 ;Help Tab
 Gui, Tab, Help
 Gui, Add, GroupBox, x22 y39 w430 h230 , About
 Gui, Add, Link, x32 y59, Check the <a href="https://github.com/Pyrree/Robocopy-generator">GitHub page</a>
 ;Other
-Gui, Show, w479 h379, Robocopy Generator v0.1.4
+Gui, Show, w479 h379, Robocopy Generator v0.2.0
 return
 
 GuiClose:
@@ -61,10 +65,12 @@ ExitApp
 
 Source:
 GuiControlGet, Source
+GuiControl,, Output, %robocopy% %Source% %Dest% %SubDir%%RestartMode%%CopyAll%%Mirror%`r`n
 return
 
 Dest:
 GuiControlGet, Dest
+GuiControl,, Output, %robocopy% %Source% %Dest% %SubDir%%RestartMode%%CopyAll%%Mirror%`r`n
 return
 
 FileCards:
@@ -72,7 +78,12 @@ GuiControlGet, FileCards
 return
 
 Checkboxes:
-Gui, Submit, NoHide
+;Gui, Submit, NoHide
+GuiControlGet, SubDir
+GuiControlGet, RestartMode
+GuiControlGet, CopyAll
+GuiControlGet, Mirror
+
 if SubDir = 1
 	SubDir :=" /S"
 if Subdir = 0
@@ -92,6 +103,8 @@ if Mirror = 1
 	Mirror :=" /MIR"
 if Mirror = 0
 	Mirror :=""
+
+GuiControl,, Output, %robocopy% %Source% %Dest% %SubDir%%RestartMode%%CopyAll%%Mirror%`r`n
 return
 
 Output:
@@ -99,9 +112,6 @@ Output = "Robocopy %Mirror%"
 return
 
 TestSomething:
-Gui, Submit, NoHide
-NewVarOutput := Output
-GuiControl,, NewVarOutput, %Output%
 Return
 
 ;Run and Generate batch file
@@ -135,6 +145,14 @@ robocopy %Source% %Dest% %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
 pause
 exit
 ), %A_ScriptDir%\Batch-temp.bat
+
+msgbox, 0, Done!,
+(
+Successfully generated file "Batch-temp.bat".
+
+Location:
+%A_ScriptDir%\Batch-temp.bat
+)
 return
 
 ;Robocopy C:\temp C:\Test \s \zb \copyall \mir \unilog<Logfile> \r: \w:
