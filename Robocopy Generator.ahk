@@ -1,5 +1,5 @@
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
-#Warn  ; Enable warnings to assist with detecting common errors.
+;Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
@@ -54,8 +54,37 @@ Gui, Tab, Help
 Gui, Add, GroupBox, x22 y39 w430 h230 , About
 Gui, Add, Link, x32 y59, Check the <a href="https://github.com/Pyrree/Robocopy-generator">GitHub page</a>
 ;Other
-Gui, Show, w479 h379, Robocopy Generator v0.2.0
+Gui, Show, w479 h379, Robocopy Generator v0.2.1
+OnMessage(0x200, "Help")
 return
+
+Help(wParam, lParam, Msg) {
+
+MouseGetPos,,,, CheckboxHelperVar
+
+If CheckboxHelperVar = Button8
+{
+	Help := "This is subdirs"
+}
+
+If CheckboxHelperVar = Button9
+{
+	Help := "This is Restartable mode"
+}
+
+If CheckboxHelperVar = Button10
+{
+	Help := "Copy all file information"
+}
+
+If CheckboxHelperVar = Button11
+{
+	Help := "Mirror folders"
+}
+
+ToolTip % Help
+
+}
 
 GuiClose:
 ExitApp
@@ -107,12 +136,7 @@ if Mirror = 0
 GuiControl,, Output, %robocopy% %Source% %Dest% %SubDir%%RestartMode%%CopyAll%%Mirror%`r`n
 return
 
-Output:
-Output = "Robocopy %Mirror%"
-return
 
-TestSomething:
-Return
 
 ;Run and Generate batch file
 ;##############################################################
