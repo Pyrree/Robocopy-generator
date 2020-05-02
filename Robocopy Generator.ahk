@@ -3,7 +3,7 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
-;Some Predetermined variables, at least until I find another way of doing the checkboxes
+;Some Predetermined variables, at least until I find another way of doing it
 robocopy :="robocopy"
 Source :=""
 Dest :=""
@@ -18,9 +18,11 @@ FileCards :=""
 ;##############################################################
 
 ;Shown on all tabs
-Gui, Add, Button, gRunScript x22 y319 w100 h30 , Run Script
+Gui, Add, GroupBox, x22 y290 w430 h90 , Batch output
+Gui, Add, Edit, ReadOnly x32 y305 w410 h70 vOutput, 
+Gui, Add, Button, gRunScript x22 y380 w100 h30 , Run Script
 ;Gui, Add, Button, gTestSomething x240 y319 w100 h30 , Test 
-Gui, Add, Button, gGenerateFile x352 y319 w100 h30 , Generate
+Gui, Add, Button, gGenerateFile x352 y380 w100 h30 , Generate
 ;Tabs Properties
 Gui, Add, Tab2, x12 y9 w450 h280 , Path|Options|Output|Help
 ;Path tab
@@ -47,14 +49,12 @@ Gui, Tab, Output
 Gui, Add, CheckBox, x32 y219 w100 h40 , Create logfile
 Gui, Add, Edit, x142 y229 w290 h20 , 
 Gui, Add, GroupBox, x22 y199 w430 h70 , Logging
-Gui, Add, GroupBox, x22 y39 w430 h160 , Batch output
-Gui, Add, Edit, ReadOnly x32 y59 w410 h130 vOutput, 
 ;Help Tab
 Gui, Tab, Help
 Gui, Add, GroupBox, x22 y39 w430 h230 , About
 Gui, Add, Link, x32 y59, Check the <a href="https://github.com/Pyrree/Robocopy-generator">GitHub page</a>
 ;Other
-Gui, Show, w479 h379, Robocopy Generator v0.2.1
+Gui, Show, w479 h430, Robocopy Generator v0.2.2
 OnMessage(0x200, "Help")
 return
 
