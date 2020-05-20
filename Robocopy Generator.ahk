@@ -21,7 +21,6 @@ FileCards :=""
 Gui, Add, GroupBox, x22 y290 w430 h90 , Batch output
 Gui, Add, Edit, ReadOnly x32 y305 w410 h70 vOutput, 
 Gui, Add, Button, gRunScript x22 y380 w100 h30 , Run Script
-;Gui, Add, Button, gTestSomething x240 y319 w100 h30 , Test 
 Gui, Add, Button, gGenerateFile x352 y380 w100 h30 , Generate
 ;Tabs Properties
 Gui, Add, Tab2, x12 y9 w450 h280 , Path|Options|Output|Help
@@ -94,12 +93,12 @@ ExitApp
 
 Source:
 GuiControlGet, Source
-GuiControl,, Output, %robocopy% %Source% %Dest% %SubDir%%RestartMode%%CopyAll%%Mirror%`r`n
+GuiControl, , % "Output", %  robocopy " """ Source """ """ Dest """ " SubDir RestartMode CopyAll Mirror "`r`n"
 return
 
 Dest:
 GuiControlGet, Dest
-GuiControl,, Output, %robocopy% %Source% %Dest% %SubDir%%RestartMode%%CopyAll%%Mirror%`r`n
+GuiControl, , % "Output", %  robocopy " """ Source """ """ Dest """ " SubDir RestartMode CopyAll Mirror "`r`n"
 return
 
 FileCards:
@@ -133,7 +132,7 @@ if Mirror = 1
 if Mirror = 0
 	Mirror :=""
 
-GuiControl,, Output, %robocopy% %Source% %Dest% %SubDir%%RestartMode%%CopyAll%%Mirror%`r`n
+GuiControl, , % "Output", %  robocopy " """ Source """ """ Dest """ " SubDir RestartMode CopyAll Mirror "`r`n"
 return
 
 
@@ -143,11 +142,24 @@ return
 
 RunScript:
 if FileExist(A_ScriptDir "\batch-temp.bat")
-	FileDelete, %A_ScriptDir%\Batch-temp.bat
+	MsgBox, 4, Error,
+(
+Error saving file as:
+%A_ScriptDir%\Batch-temp.bat
+
+Batch file with that name already exists,
+Would you like to replace it?
+)
+	IfMsgBox Yes
+		{
+			FileDelete, %A_ScriptDir%\Batch-temp.bat
+		}
+	else
+		return
 
 FileAppend,
 (
-robocopy %Source% %Dest% %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
+robocopy "%Source%" "%Dest%" %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
 
 pause
 exit
@@ -155,30 +167,64 @@ exit
 
 Sleep, 200
 
-run, %A_ScriptDir%\Batch-temp.bat
-return
+MsgBox, 4, Caution!,
+(
+This is the missclick security guard!
+Are you sure you would like to run this script?!
+
+From: "%Source%"
+
+To: "%Dest%"
+
+Options: %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
+)
+IfMsgBox Yes
+	{
+		run, %A_ScriptDir%\Batch-temp.bat
+	}
+else
+	return
 
 GenerateFile:
 if FileExist(A_ScriptDir "\batch-temp.bat")
-	FileDelete, %A_ScriptDir%\Batch-temp.bat
+	MsgBox, 4, Error,
+(
+Error saving file as:
+%A_ScriptDir%\Batch-temp.bat
+
+Batch file with that name already exists,
+Would you like to replace it?
+)
+	IfMsgBox Yes
+		{
+			FileDelete, %A_ScriptDir%\Batch-temp.bat
+		}
+	else
+		return
 
 FileAppend,
 (
-robocopy %Source% %Dest% %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
+robocopy "%Source%" "%Dest%" %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
 
 pause
 exit
 ), %A_ScriptDir%\Batch-temp.bat
 
-msgbox, 0, Done!,
+
+MsgBox, 4, Beep-Boop Batch file complete!, 
 (
 Successfully generated file "Batch-temp.bat".
 
 Location:
 %A_ScriptDir%\Batch-temp.bat
+
+Would you like to open the folder?
 )
-return
+IfMsgBox Yes
+    {
+		Run, %A_ScriptDir%\
+	}
+else
+    Return
 
 ;Robocopy C:\temp C:\Test \s \zb \copyall \mir \unilog<Logfile> \r: \w:
-
-;Test commit via vscode
