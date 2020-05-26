@@ -62,22 +62,22 @@ Help(wParam, lParam, Msg) {
 
 MouseGetPos,,,, CheckboxHelperVar
 
-If CheckboxHelperVar = Button9
+If CheckboxHelperVar = Button11
 {
 	Help := "Copy Subdirectories, but not empty ones"
 }
 
-If CheckboxHelperVar = Button10
+If CheckboxHelperVar = Button12
 {
 	Help := "Use restartable mode; if access denied use Backup mode"
 }
 
-If CheckboxHelperVar = Button11
+If CheckboxHelperVar = Button13
 {
 	Help := "Copy ALL file info (equivalent to /COPY:DATSOU)"
 }
 
-If CheckboxHelperVar = Button12
+If CheckboxHelperVar = Button14
 {
 	Help := "Mirror a directory tree (equivalent to /E plus /PURGE)"
 }
