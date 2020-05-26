@@ -23,37 +23,38 @@ Gui, Add, Edit, ReadOnly x32 y305 w410 h70 vOutput,
 Gui, Add, Button, gRunScript x22 y380 w100 h30 , Run Script
 Gui, Add, Button, gGenerateFile x352 y380 w100 h30 , Generate
 ;Tabs Properties
-Gui, Add, Tab2, x12 y9 w450 h280 , Path|Options|Output|Help
+Gui, Add, Tab2, x12 y9 w450 h280 , Path|Options|Advanced|Help
 ;Path tab
 Gui, Add, GroupBox, x22 y39 w430 h50 , Source
-Gui, Add, Edit, x32 y59 w410 h20 vSource gSource 
+Gui, Add, Edit, x32 y59 w410 h20 vSource gGuiInput 
 Gui, Add, GroupBox, x22 y99 w430 h50 , Destination
 Gui, Add, GroupBox, x22 y159 w430 h50 , File(s) and Wildcard(s)
-Gui, Add, Edit, x32 y119 w410 h20 vDest gDest 
-Gui, Add, Edit, x32 y179 w410 h20 vFileCards gFileCards, 
+Gui, Add, Edit, x32 y119 w410 h20 vDest gGuiInput 
+Gui, Add, Edit, ReadOnly x32 y179 w410 h20 vFileCards gFileCards, Not yet implemented
+Gui, Add, CheckBox, x32 y233 w100 h40 , Create logfile
+Gui, Add, Edit, ReadOnly x133 y243 w290 h20 , Not yet implemented
+Gui, Add, GroupBox, x22 y219 w430 h60 , Logging
 ;Options Tab
 Gui, Tab, Options
 Gui, Add, GroupBox, x32 y49 w150 h180 , Group 1
 Gui, Add, GroupBox, x192 y49 w250 h140 , Group 2
-Gui, Add, CheckBox, x42 y69 w130 h30 vSubDir gCheckboxes , Subdirectories
-Gui, Add, CheckBox, x42 y109 w130 h30 vRestartMode gCheckboxes , Restartable mode
-Gui, Add, CheckBox, x42 y149 w130 h30 vCopyAll gCheckboxes , Copy all file information
-Gui, Add, CheckBox, x42 y189 w130 h30 vMirror gCheckboxes , Mirror
+Gui, Add, CheckBox, x42 y69 w130 h30 vSubDir gGuiInput , Subdirectories
+Gui, Add, CheckBox, x42 y109 w130 h30 vRestartMode gGuiInput , Restartable mode
+Gui, Add, CheckBox, x42 y149 w130 h30 vCopyAll gGuiInput , Copy all file information
+Gui, Add, CheckBox, x42 y189 w130 h30 vMirror gGuiInput , Mirror
 Gui, Add, GroupBox, x202 y69 w230 h50 , Restart amount
 Gui, Add, GroupBox, x202 y129 w230 h50 , Wait amount
-Gui, Add, Edit, x212 y149 w210 h20 , 
-Gui, Add, Edit, x212 y89 w210 h20 , 
+Gui, Add, Edit, ReadOnly x212 y149 w210 h20 , Not yet implemented
+Gui, Add, Edit, ReadOnly x212 y89 w210 h20 , Not yet implemented
 ;Output Tab
-Gui, Tab, Output
-Gui, Add, CheckBox, x32 y219 w100 h40 , Create logfile
-Gui, Add, Edit, x142 y229 w290 h20 , 
-Gui, Add, GroupBox, x22 y199 w430 h70 , Logging
+Gui, Tab, Advanced
+Gui, Add, Text, x32 y59, Sorry, there is nothing here for you yet!
 ;Help Tab
 Gui, Tab, Help
 Gui, Add, GroupBox, x22 y39 w430 h230 , About
 Gui, Add, Link, x32 y59, Check the <a href="https://github.com/Pyrree/Robocopy-generator">GitHub page</a>
 ;Other
-Gui, Show, w479 h430, Robocopy Generator v0.2.2
+Gui, Show, w479 h430, Robocopy Generator v0.3.0
 OnMessage(0x200, "Help")
 return
 
@@ -61,24 +62,24 @@ Help(wParam, lParam, Msg) {
 
 MouseGetPos,,,, CheckboxHelperVar
 
-If CheckboxHelperVar = Button8
-{
-	Help := "This is subdirs"
-}
-
 If CheckboxHelperVar = Button9
 {
-	Help := "This is Restartable mode"
+	Help := "Copy Subdirectories, but not empty ones"
 }
 
 If CheckboxHelperVar = Button10
 {
-	Help := "Copy all file information"
+	Help := "Use restartable mode; if access denied use Backup mode"
 }
 
 If CheckboxHelperVar = Button11
 {
-	Help := "Mirror folders"
+	Help := "Copy ALL file info (equivalent to /COPY:DATSOU)"
+}
+
+If CheckboxHelperVar = Button12
+{
+	Help := "Mirror a directory tree (equivalent to /E plus /PURGE)"
 }
 
 ToolTip % Help
@@ -90,23 +91,13 @@ ExitApp
 
 ;All functions and buttons
 ;##############################################################
-
-Source:
-GuiControlGet, Source
-GuiControl, , % "Output", %  robocopy " """ Source """ """ Dest """ " SubDir RestartMode CopyAll Mirror "`r`n"
-return
-
-Dest:
-GuiControlGet, Dest
-GuiControl, , % "Output", %  robocopy " """ Source """ """ Dest """ " SubDir RestartMode CopyAll Mirror "`r`n"
-return
-
 FileCards:
 GuiControlGet, FileCards
 return
 
-Checkboxes:
-;Gui, Submit, NoHide
+GuiInput:
+GuiControlGet, Source
+GuiControlGet, Dest
 GuiControlGet, SubDir
 GuiControlGet, RestartMode
 GuiControlGet, CopyAll
@@ -139,8 +130,14 @@ return
 
 ;Run and Generate batch file
 ;##############################################################
-
 RunScript:
+if (Source == "" && Dest == "")
+    MsgBox, % "Source and Destination is empty, please choose a folder"
+else if (Source = "")
+    MsgBox, % "Source is empty, please choose a folder"
+else if (Dest = "")
+    MsgBox, % "Destination is empty please choose a folder"
+else
 if FileExist(A_ScriptDir "\batch-temp.bat")
 	MsgBox, 4, Error,
 (
@@ -183,9 +180,16 @@ IfMsgBox Yes
 		run, %A_ScriptDir%\Batch-temp.bat
 	}
 else
-	return
+return
 
 GenerateFile:
+if (Source == "" && Dest == "")
+    MsgBox, % "Source and Destination is empty, please choose a folder"
+else if (Source = "")
+    MsgBox, % "Source is empty, please choose a folder"
+else if (Dest = "")
+    MsgBox, % "Destination is empty please choose a folder"
+else
 if FileExist(A_ScriptDir "\batch-temp.bat")
 	MsgBox, 4, Error,
 (
@@ -221,10 +225,8 @@ Location:
 Would you like to open the folder?
 )
 IfMsgBox Yes
-    {
+	{
 		Run, %A_ScriptDir%\
 	}
 else
-    Return
-
-;Robocopy C:\temp C:\Test \s \zb \copyall \mir \unilog<Logfile> \r: \w:
+Return
