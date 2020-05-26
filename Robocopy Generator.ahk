@@ -3,7 +3,7 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
-;Some Predetermined variables, at least until I find another way of doing it
+;Set predetermined variables here
 robocopy :="robocopy"
 Source :=""
 Dest :=""
@@ -16,12 +16,11 @@ FileCards :=""
 
 ;Everything GUI
 ;##############################################################
-
 ;Shown on all tabs
 Gui, Add, GroupBox, x22 y290 w430 h90 , Batch output
 Gui, Add, Edit, ReadOnly x32 y305 w410 h70 vOutput, 
-Gui, Add, Button, gRunScript x22 y380 w100 h30 , Run Script
-Gui, Add, Button, gGenerateFile x352 y380 w100 h30 , Generate
+Gui, Add, Button, gSetRunScript x22 y380 w100 h30 , Run Script
+Gui, Add, Button, gSetGenerateFile x352 y380 w100 h30 , Generate
 ;Tabs Properties
 Gui, Add, Tab2, x12 y9 w450 h280 , Path|Options|Advanced|Help
 ;Path tab
@@ -30,7 +29,7 @@ Gui, Add, Edit, x32 y59 w410 h20 vSource gGuiInput
 Gui, Add, GroupBox, x22 y99 w430 h50 , Destination
 Gui, Add, GroupBox, x22 y159 w430 h50 , File(s) and Wildcard(s)
 Gui, Add, Edit, x32 y119 w410 h20 vDest gGuiInput 
-Gui, Add, Edit, ReadOnly x32 y179 w410 h20 vFileCards gFileCards, Not yet implemented
+Gui, Add, Edit, ReadOnly x32 y179 w410 h20 vFileCards gGuiInput, Not yet implemented
 Gui, Add, CheckBox, x32 y233 w100 h40 , Create logfile
 Gui, Add, Edit, ReadOnly x133 y243 w290 h20 , Not yet implemented
 Gui, Add, GroupBox, x22 y219 w430 h60 , Logging
@@ -83,21 +82,14 @@ If CheckboxHelperVar = Button14
 }
 
 ToolTip % Help
-
 }
 
-GuiClose:
-ExitApp
-
-;All functions and buttons
+;The GUI fields and buttons
 ;##############################################################
-FileCards:
-GuiControlGet, FileCards
-return
-
 GuiInput:
 GuiControlGet, Source
 GuiControlGet, Dest
+;GuiControlGet, FileCards
 GuiControlGet, SubDir
 GuiControlGet, RestartMode
 GuiControlGet, CopyAll
@@ -127,10 +119,17 @@ GuiControl, , % "Output", %  robocopy " """ Source """ """ Dest """ " SubDir Res
 return
 
 
-
 ;Run and Generate batch file
 ;##############################################################
-RunScript:
+SetRunScript:
+RunScript :=True
+goto, CreateScript
+
+SetGenerateFile:
+GenerateFile :=True
+goto, CreateScript
+
+CreateScript:
 if (Source == "" && Dest == "")
     MsgBox, % "Source and Destination is empty, please choose a folder"
 else if (Source = "")
@@ -164,7 +163,9 @@ exit
 
 Sleep, 200
 
-MsgBox, 4, Caution!,
+if (RunScript = True)
+{
+	MsgBox, 4, Caution!,
 (
 This is the missclick security guard!
 Are you sure you would like to run this script?!
@@ -181,41 +182,10 @@ IfMsgBox Yes
 	}
 else
 return
-
-GenerateFile:
-if (Source == "" && Dest == "")
-    MsgBox, % "Source and Destination is empty, please choose a folder"
-else if (Source = "")
-    MsgBox, % "Source is empty, please choose a folder"
-else if (Dest = "")
-    MsgBox, % "Destination is empty please choose a folder"
-else
-if FileExist(A_ScriptDir "\batch-temp.bat")
-	MsgBox, 4, Error,
-(
-Error saving file as:
-%A_ScriptDir%\Batch-temp.bat
-
-Batch file with that name already exists,
-Would you like to replace it?
-)
-	IfMsgBox Yes
-		{
-			FileDelete, %A_ScriptDir%\Batch-temp.bat
-		}
-	else
-		return
-
-FileAppend,
-(
-robocopy "%Source%" "%Dest%" %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
-
-pause
-exit
-), %A_ScriptDir%\Batch-temp.bat
-
-
-MsgBox, 4, Beep-Boop Batch file complete!, 
+}
+else if (GenerateFile = True)
+{
+	MsgBox, 4, Beep-Boop Batch file complete!, 
 (
 Successfully generated file "Batch-temp.bat".
 
@@ -230,3 +200,7 @@ IfMsgBox Yes
 	}
 else
 Return
+}
+
+GuiClose:
+ExitApp
