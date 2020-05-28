@@ -135,7 +135,7 @@ if (Source == "" && Dest == "")
 else if (Source = "")
     MsgBox, % "Source is empty, please choose a folder"
 else if (Dest = "")
-    MsgBox, % "Destination is empty please choose a folder"
+    MsgBox, % "Destination is empty, please choose a folder"
 else
 if FileExist(A_ScriptDir "\batch-temp.bat")
 	MsgBox, 4, Error,
@@ -160,8 +160,6 @@ robocopy "%Source%" "%Dest%" %FileCards%%SubDir%%RestartMode%%CopyAll%%Mirror%
 pause
 exit
 ), %A_ScriptDir%\Batch-temp.bat
-
-Sleep, 200
 
 if (RunScript = True)
 {
